@@ -124,7 +124,6 @@ public class Jimple extends HashMap<String, Object> {
         Object item = super.get(key);
         if (item instanceof SimpleItem) {
             item = ((SimpleItem) item).create();
-            this.put((String) key, item);
         }
         return item;
     }

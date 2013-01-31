@@ -65,6 +65,9 @@ container.put("Bar", container.share(new Jimple.Item() {
 	}
 }));
 ```
+
+See tests for more usage examples.
+
 ## Authors
 [Fabien Potencier](http://fabien.potencier.org/) - creator of the Symfony framework and [Pimple](http://pimple.sensiolabs.org/).
 

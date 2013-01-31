@@ -35,7 +35,7 @@ public class Jimple extends HashMap<String, Object> {
      * Jimple Item
      */
     interface Item {
-        public Object create();
+        public Object create(Jimple c);
     }
 
     /**
@@ -46,28 +46,34 @@ public class Jimple extends HashMap<String, Object> {
     }
 
     private class SimpleItem {
-        protected final Item item;
+        private final Item item;
+        private final Jimple c;
 
-        private SimpleItem(Item item) {
+        private SimpleItem(Item item, Jimple c) {
             this.item = item;
+            this.c = c;
         }
 
         protected Object create() {
-            return this.item.create();
+            return this.item.create(this.c);
+        }
+
+        private Item getItem() {
+            return item;
         }
     }
 
     private class SharedItem extends SimpleItem {
         private Object instance;
 
-        private SharedItem(Item item) {
-            super(item);
+        private SharedItem(Item item, Jimple c) {
+            super(item, c);
         }
 
         @Override
         protected Object create() {
             if (this.instance == null) {
-                this.instance = this.item.create();
+                this.instance = super.create();
             }
             return instance;
         }
@@ -76,8 +82,8 @@ public class Jimple extends HashMap<String, Object> {
     private class ExtendedItem extends SimpleItem {
         private Extender extender;
 
-        private ExtendedItem(Item item, Extender extender) {
-            super(item);
+        private ExtendedItem(Item item, Jimple c, Extender extender) {
+            super(item, c);
             this.extender = extender;
         }
 
@@ -95,7 +101,7 @@ public class Jimple extends HashMap<String, Object> {
      * @return The wrapped Item
      */
     public SharedItem share(Item item) {
-        return new SharedItem(item);
+        return new SharedItem(item, this);
     }
 
     /**
@@ -114,7 +120,7 @@ public class Jimple extends HashMap<String, Object> {
         }
         Object item = super.get(key);
         if (item instanceof SimpleItem) {
-            return new ExtendedItem((Item) super.get(key), extender);
+            return new ExtendedItem((Item) super.get(key), this, extender);
         }
         throw new IllegalArgumentException("Identifier " + key + " does not contain an object definition.");
     }
@@ -131,7 +137,7 @@ public class Jimple extends HashMap<String, Object> {
     @Override
     public Object put(String key, Object value) {
         if (value instanceof Item) {
-            value = new SimpleItem((Item) value);
+            value = new SimpleItem((Item) value, this);
         }
         return super.put(key, value);
     }
@@ -142,7 +148,11 @@ public class Jimple extends HashMap<String, Object> {
      * @param key The unique identifier for the parameter or object
      * @return The value of the parameter or the Item defining an object
      */
-    public Item raw(String key) {
-        return (Item) super.get(key);
+    public Object raw(String key) {
+        Object value = super.get(key);
+        if (value instanceof SimpleItem) {
+            value = ((SimpleItem) super.get(key)).getItem();
+        }
+        return value;
     }
 }

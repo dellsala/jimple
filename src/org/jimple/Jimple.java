@@ -34,14 +34,14 @@ public class Jimple extends HashMap<String, Object> {
     /**
      * Jimple Item
      */
-    interface Item {
+    public interface Item {
         public Object create(Jimple c);
     }
 
     /**
      * Jimple Item extender
      */
-    interface Extender {
+    public interface Extender {
         public Object extend(Object object);
     }
 

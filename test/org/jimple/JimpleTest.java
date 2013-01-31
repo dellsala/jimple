@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+
 public class JimpleTest {
     private Jimple jimple;
 
@@ -89,6 +91,27 @@ public class JimpleTest {
             }
         });
         Assert.assertTrue(this.jimple.containsKey("test"));
+    }
+
+    @Test
+    public void testExtendItem() throws Exception {
+        this.jimple.put("test", new Jimple.Item() {
+            @Override
+            public Object create(Jimple c) {
+                return new Object();
+            }
+        });
+        this.jimple.put("extendedTest", this.jimple.extend("test", new Jimple.Extender() {
+            @Override
+            public Object extend(Object object) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                map.put("test", object);
+                return map;
+            }
+        }));
+        Assert.assertFalse(this.jimple.get("test") instanceof HashMap);
+        Assert.assertTrue(this.jimple.get("extendedTest") instanceof HashMap);
+        Assert.assertTrue(((HashMap<String, Object>) this.jimple.get("extendedTest")).containsKey("test"));
     }
 
     @Test

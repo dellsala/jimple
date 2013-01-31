@@ -120,7 +120,7 @@ public class Jimple extends HashMap<String, Object> {
         }
         Object item = super.get(key);
         if (item instanceof SimpleItem) {
-            return new ExtendedItem((Item) super.get(key), this, extender);
+            return new ExtendedItem((Item) this.raw(key), this, extender);
         }
         throw new IllegalArgumentException("Identifier " + key + " does not contain an object definition.");
     }

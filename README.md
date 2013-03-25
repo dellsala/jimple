@@ -32,14 +32,14 @@ Objects are defined by `Jimple.Item` in `create()` method:
 container.put("Foo", new Jimple.Item<Foo>() {
 	@Override
 	public Foo create(Jimple c) {
-	    return new Foo(c.get("param");
+	    return new Foo(c.get("param"));
 	}
 });
 
 container.put("Bar", new Jimple.Item<Bar>() {
 	@Override
 	public Bar create(Jimple c) {
-	    return new Bar(c.get("Foo");
+	    return new Bar(c.get("Foo"));
 	}
 });
 ```
@@ -62,7 +62,7 @@ By default, each time you get an object, Pimple returns a new instance of it. If
 container.put("Bar", container.share(new Jimple.Item<Bar>() {
 	@Override
 	public Bar create(Jimple c) {
-	    return new Bar(c.get("Foo");
+	    return new Bar(c.get("Foo"));
 	}
 }));
 ```

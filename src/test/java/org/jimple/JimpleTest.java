@@ -10,6 +10,12 @@ import java.util.HashMap;
 public class JimpleTest {
     private Jimple jimple;
 
+    private class TestItem {
+    }
+
+    private class TestExtendedItem {
+    }
+
     @Before
     public void setUp() throws Exception {
         this.jimple = new Jimple();
@@ -21,26 +27,27 @@ public class JimpleTest {
 
     @Test
     public void testShare() throws Exception {
-        Assert.assertFalse(this.jimple.share(new Jimple.Item() {
+        Assert.assertFalse(this.jimple.share(new Jimple.Item<TestItem>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public TestItem create(Jimple c) {
+                return new TestItem();
             }
         }) instanceof Jimple.Item);
     }
 
     @Test
     public void testExtend() throws Exception {
-        this.jimple.put("test", new Jimple.Item() {
+        this.jimple.put("test", new Jimple.Item<TestItem>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public TestItem create(Jimple c) {
+                return new TestItem();
             }
         });
-        Assert.assertFalse(this.jimple.extend("test", new Jimple.Extender() {
+        //noinspection unchecked
+        Assert.assertFalse(this.jimple.extend("test", new Jimple.Extender<TestExtendedItem>() {
             @Override
-            public Object extend(Object object) {
-                return new Object();
+            public TestExtendedItem extend(TestExtendedItem item) {
+                return new TestExtendedItem();
             }
         }) instanceof Jimple.Item);
     }
@@ -54,10 +61,10 @@ public class JimpleTest {
 
     @Test
     public void testGetItem() throws Exception {
-        this.jimple.put("test", new Jimple.Item() {
+        this.jimple.put("test", new Jimple.Item<TestItem>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public TestItem create(Jimple c) {
+                return new TestItem();
             }
         });
         Assert.assertFalse(this.jimple.get("test") instanceof Jimple.Item);
@@ -66,10 +73,10 @@ public class JimpleTest {
 
     @Test
     public void testGetSharedItem() throws Exception {
-        this.jimple.put("test", this.jimple.share(new Jimple.Item() {
+        this.jimple.put("test", this.jimple.share(new Jimple.Item<TestItem>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public TestItem create(Jimple c) {
+                return new TestItem();
             }
         }));
         Assert.assertFalse(this.jimple.get("test") instanceof Jimple.Item);
@@ -84,10 +91,10 @@ public class JimpleTest {
 
     @Test
     public void testPutItem() throws Exception {
-        this.jimple.put("test", new Jimple.Item() {
+        this.jimple.put("test", new Jimple.Item<TestItem>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public TestItem create(Jimple c) {
+                return new TestItem();
             }
         });
         Assert.assertTrue(this.jimple.containsKey("test"));
@@ -95,31 +102,34 @@ public class JimpleTest {
 
     @Test
     public void testExtendItem() throws Exception {
-        this.jimple.put("test", new Jimple.Item() {
+        this.jimple.put("test", new Jimple.Item<HashMap<String, String>>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public HashMap<String, String> create(Jimple c) {
+                return new HashMap<String, String>();
             }
         });
-        this.jimple.put("extendedTest", this.jimple.extend("test", new Jimple.Extender() {
+        this.jimple.put("extendedTest", this.jimple.extend("test", new Jimple.Extender<HashMap<String, String>>() {
             @Override
-            public Object extend(Object object) {
-                HashMap<String, Object> map = new HashMap<String, Object>();
-                map.put("test", object);
-                return map;
+            public <E extends HashMap<String, String>> E extend(HashMap<String, String> map) {
+                map.put("test", "test");
+                //noinspection unchecked
+                return (E) map;
             }
         }));
-        Assert.assertFalse(this.jimple.get("test") instanceof HashMap);
+        Assert.assertTrue(this.jimple.get("test") instanceof HashMap);
         Assert.assertTrue(this.jimple.get("extendedTest") instanceof HashMap);
-        Assert.assertTrue(((HashMap<String, Object>) this.jimple.get("extendedTest")).containsKey("test"));
+        //noinspection unchecked
+        Assert.assertTrue(((HashMap<String, String>) this.jimple.get("extendedTest")).containsKey("test"));
+        //noinspection unchecked
+        Assert.assertFalse(((HashMap<String, String>) this.jimple.get("test")).containsKey("test"));
     }
 
     @Test
     public void testRaw() throws Exception {
-        Jimple.Item item = new Jimple.Item() {
+        Jimple.Item item = new Jimple.Item<TestItem>() {
             @Override
-            public Object create(Jimple c) {
-                return new Object();
+            public TestItem create(Jimple c) {
+                return new TestItem();
             }
         };
         this.jimple.put("test", item);

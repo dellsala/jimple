@@ -29,16 +29,16 @@ container.put("param", "theParam");
 Objects are defined by `Jimple.Item` in `create()` method:
 
 ```java
-container.put("Foo", new Jimple.Item() {
+container.put("Foo", new Jimple.Item<Foo>() {
 	@Override
-	public Object create(Jimple c) {
+	public Foo create(Jimple c) {
 	    return new Foo((String) c.get("param"));
 	}
 });
 
-container.put("Bar", new Jimple.Item() {
+container.put("Bar", new Jimple.Item<Bar>() {
 	@Override
-	public Object create(Jimple c) {
+	public Bar create(Jimple c) {
 	    return new Bar((Foo) c.get("Foo"));
 	}
 });
@@ -49,7 +49,7 @@ Using the defined objects is also very easy:
 
 ```java
 // get the `Bar` object
-Bar bar = (Bar) container.get("Bar");
+Bar bar = container.get("Bar");
 
 // the above call is roughly equivalent to the following code:
 // Foo foo = new Foo("param");
@@ -59,9 +59,9 @@ Bar bar = (Bar) container.get("Bar");
 By default, each time you get an object, Pimple returns a new instance of it. If you want the same instance to be returned for all calls, wrap your `Jimple.Item` with the `share()` method:
 
 ```java
-container.put("Bar", container.share(new Jimple.Item() {
+container.put("Bar", container.share(new Jimple.Item<Bar>() {
 	@Override
-	public Object create(Jimple c) {
+	public Bar create(Jimple c) {
 	    return new Bar((Foo) c.get("Foo"));
 	}
 }));
